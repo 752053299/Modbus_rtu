@@ -7,6 +7,7 @@ namespace Modbus_RTU
 {
     static class Program
     {
+       public static Form1 mainForm;
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -15,7 +16,8 @@ namespace Modbus_RTU
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            mainForm = new Form1();
+            Application.Run(mainForm);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Modbus_RTU
@@ -72,9 +73,9 @@ namespace Modbus_RTU
         #endregion
    
         /// <summary>
-        /// 串口打开
+        /// 串口属性写入
         /// </summary>
-        private void startPort()
+        private void getPortAttributes()
         {
 
                 if (serialPort1 == null)
@@ -125,8 +126,6 @@ namespace Modbus_RTU
                         break;
                 }
 
-
-
             }
             catch (Exception ex)
             {
@@ -134,15 +133,66 @@ namespace Modbus_RTU
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        //串口发送按钮
+        private void buttonSend_Click(object sender, EventArgs e)
         {
-            
-            Console.WriteLine("串口是否打开：" + serialPort1.IsOpen);
+            string sendString = textBoxSend.Text;
+            //开启发送线程
+         ThreadPool.QueueUserWorkItem(new WaitCallback(Background.BackgroundSend), sendString);
+
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        //串口打开与关闭
+        private void buttonOpen_Click(object sender, EventArgs e)
         {
-            startPort();
+           
+            if (comboBoxPort.Text.Equals(""))
+            {
+                MessageBox.Show("请选择串口");
+            }
+            else
+            {
+                
+                if (!serialPort1.IsOpen)//开始
+                {
+                    getPortAttributes();
+                    try
+                    {
+                        serialPort1.Open();
+                        buttonOpen.Text = "停止";
+
+                        comboBoxBaud.Enabled = false;
+                        comboBoxDateBite.Enabled = false;
+                        comboBoxPort.Enabled = false;
+                        comboBoxParity.Enabled = false;
+                        comboBoxStopBit.Enabled = false;
+
+                  //      ThreadPool.QueueUserWorkItem(new WaitCallback())
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        
+                    }
+
+                }
+                else //停止
+                {
+                    buttonOpen.Text = "打开串口";
+
+                    serialPort1.Close();
+
+                    comboBoxBaud.Enabled = true;
+                    comboBoxDateBite.Enabled = true;
+                    comboBoxPort.Enabled = true;
+                    comboBoxParity.Enabled = true;
+                    comboBoxStopBit.Enabled = true;
+
+
+                }
+                
+            }
+            
         }
     }
 }
